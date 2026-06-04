@@ -980,7 +980,12 @@ fn test_group_by_projection_pd_same_column() -> PolarsResult<()> {
     };
 
     let out = a()
-        .left_join(a(), col("foo"), col("foo"))
+        .join(
+            a(),
+            [col("foo")],
+            [col("foo")],
+            JoinArgs::new(JoinType::Left).with_maintain_order(MaintainOrderJoin::LeftRight),
+        )
         .select([col("bar")])
         .collect()?;
 
