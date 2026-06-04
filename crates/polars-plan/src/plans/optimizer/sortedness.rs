@@ -519,6 +519,7 @@ fn is_sorted_rec(
             FunctionIR::Explode { columns, .. } => {
                 let mut sorted = rec!(*input);
 
+                // Truncate the sortedness to the first exploded column if one exists.
                 if let Some(sorted) = sorted.as_mut() {
                     let explode_names = names_set_scratch.get();
                     explode_names.extend(columns.iter().cloned());
@@ -535,6 +536,11 @@ fn is_sorted_rec(
                 sorted
             },
             FunctionIR::RowIndex { name, .. } => Some(IRSorted(
+                // e.g. sort([A, B]).with_row_index(), is valid to be sorted to either of:
+                // 1) [index, A, B]
+                // 2) [A, B, index]
+                // We choose (2), as that does better for the following case:
+                // `.set_sorted([A, B]).with_row_index().join_asof(on=[A, B])`
                 rec!(*input)
                     .as_ref()
                     .map_or(Default::default(), |x| x.0.iter().cloned())
