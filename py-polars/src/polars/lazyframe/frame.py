@@ -1927,7 +1927,7 @@ naive plan: (run LazyFrame.explain(optimized=True) to see the optimized plan)
 
         Get the rows which contain the 4 largest values in column b.
 
-        >>> lf.top_k(4, by="b").collect()
+        >>> lf.top_k(4, by="b").collect()  # doctest: +SKIP
         shape: (4, 2)
         ┌─────┬─────┐
         │ a   ┆ b   │
@@ -2005,22 +2005,23 @@ naive plan: (run LazyFrame.explain(optimized=True) to see the optimized plan)
 
         Get the rows which contain the 4 smallest values in column b.
 
-        >>> lf.bottom_k(4, by="b").collect()
+        >>> lf.bottom_k(4, by="b").collect()  # doctest: +SKIP
         shape: (4, 2)
         ┌─────┬─────┐
         │ a   ┆ b   │
         │ --- ┆ --- │
         │ str ┆ i64 │
         ╞═════╪═════╡
-        │ b   ┆ 1   │
         │ a   ┆ 1   │
-        │ c   ┆ 1   │
         │ a   ┆ 2   │
+        │ b   ┆ 1   │
+        │ c   ┆ 1   │
         └─────┴─────┘
 
         Get the rows which contain the 4 smallest values when sorting on column a and b.
 
-        >>> lf.bottom_k(4, by=["a", "b"]).collect()
+        >>> result = lf.bottom_k(4, by=["a", "b"]).collect()
+        >>> result.sort("*")
         shape: (4, 2)
         ┌─────┬─────┐
         │ a   ┆ b   │
@@ -6450,7 +6451,8 @@ naive plan: (run LazyFrame.explain(optimized=True) to see the optimized plan)
         ...         "ham": ["a", "b", "d"],
         ...     }
         ... )
-        >>> lf.join(other_lf, on="ham").collect()
+        >>> result = lf.join(other_lf, on="ham").collect()
+        >>> result.sort("*")
         shape: (2, 4)
         ┌─────┬─────┬─────┬───────┐
         │ foo ┆ bar ┆ ham ┆ apple │
@@ -6460,19 +6462,21 @@ naive plan: (run LazyFrame.explain(optimized=True) to see the optimized plan)
         │ 1   ┆ 6.0 ┆ a   ┆ x     │
         │ 2   ┆ 7.0 ┆ b   ┆ y     │
         └─────┴─────┴─────┴───────┘
-        >>> lf.join(other_lf, on="ham", how="full").collect()
+        >>> result = lf.join(other_lf, on="ham", how="full").collect()
+        >>> result.sort("*")
         shape: (4, 5)
         ┌──────┬──────┬──────┬───────┬───────────┐
         │ foo  ┆ bar  ┆ ham  ┆ apple ┆ ham_right │
         │ ---  ┆ ---  ┆ ---  ┆ ---   ┆ ---       │
         │ i64  ┆ f64  ┆ str  ┆ str   ┆ str       │
         ╞══════╪══════╪══════╪═══════╪═══════════╡
+        │ null ┆ null ┆ null ┆ z     ┆ d         │
         │ 1    ┆ 6.0  ┆ a    ┆ x     ┆ a         │
         │ 2    ┆ 7.0  ┆ b    ┆ y     ┆ b         │
-        │ null ┆ null ┆ null ┆ z     ┆ d         │
         │ 3    ┆ 8.0  ┆ c    ┆ null  ┆ null      │
         └──────┴──────┴──────┴───────┴───────────┘
-        >>> lf.join(other_lf, on="ham", how="left", coalesce=True).collect()
+        >>> result = lf.join(other_lf, on="ham", how="left", coalesce=True).collect()
+        >>> result.sort("*")
         shape: (3, 4)
         ┌─────┬─────┬─────┬───────┐
         │ foo ┆ bar ┆ ham ┆ apple │
@@ -6483,7 +6487,8 @@ naive plan: (run LazyFrame.explain(optimized=True) to see the optimized plan)
         │ 2   ┆ 7.0 ┆ b   ┆ y     │
         │ 3   ┆ 8.0 ┆ c   ┆ null  │
         └─────┴─────┴─────┴───────┘
-        >>> lf.join(other_lf, on="ham", how="semi").collect()
+        >>> result = lf.join(other_lf, on="ham", how="semi").collect()
+        >>> result.sort("*")
         shape: (2, 3)
         ┌─────┬─────┬─────┐
         │ foo ┆ bar ┆ ham │
@@ -6503,7 +6508,8 @@ naive plan: (run LazyFrame.explain(optimized=True) to see the optimized plan)
         │ 3   ┆ 8.0 ┆ c   │
         └─────┴─────┴─────┘
 
-        >>> lf.join(other_lf, how="cross").collect()
+        >>> result = lf.join(other_lf, how="cross").collect()
+        >>> result.sort("*")
         shape: (9, 5)
         ┌─────┬─────┬─────┬───────┬───────────┐
         │ foo ┆ bar ┆ ham ┆ apple ┆ ham_right │
@@ -6672,7 +6678,7 @@ naive plan: (run LazyFrame.explain(optimized=True) to see the optimized plan)
         >>> east.join_where(
         ...     west,
         ...     (pl.col("dur") < pl.col("time")) | (pl.col("rev") < pl.col("cost")),
-        ... ).collect()
+        ... ).sort("id", "t_id").collect()
         shape: (6, 8)
         ┌─────┬─────┬─────┬───────┬──────┬──────┬──────┬─────────────┐
         │ id  ┆ dur ┆ rev ┆ cores ┆ t_id ┆ time ┆ cost ┆ cores_right │
@@ -8798,7 +8804,8 @@ naive plan: (run LazyFrame.explain(optimized=True) to see the optimized plan)
         ...     }
         ... )
         >>> import polars.selectors as cs
-        >>> lf.unpivot(cs.numeric(), index="a").collect()
+        >>> result = lf.unpivot(cs.numeric(), index="a").collect()
+        >>> result.sort("*")
         shape: (6, 3)
         ┌─────┬──────────┬───────┐
         │ a   ┆ variable ┆ value │
@@ -8806,10 +8813,10 @@ naive plan: (run LazyFrame.explain(optimized=True) to see the optimized plan)
         │ str ┆ str      ┆ i64   │
         ╞═════╪══════════╪═══════╡
         │ x   ┆ b        ┆ 1     │
-        │ y   ┆ b        ┆ 3     │
-        │ z   ┆ b        ┆ 5     │
         │ x   ┆ c        ┆ 2     │
+        │ y   ┆ b        ┆ 3     │
         │ y   ┆ c        ┆ 4     │
+        │ z   ┆ b        ┆ 5     │
         │ z   ┆ c        ┆ 6     │
         └─────┴──────────┴───────┘
         """

@@ -1221,7 +1221,6 @@ def test_predicate_pushdown_auto_disable_strict() -> None:
     assert plan.index("FILTER") > plan.index("MARKER")
 
 
-@pytest.mark.may_fail_auto_streaming  # IO plugin validate=False schema mismatch
 def test_predicate_pushdown_map_elements_io_plugin_22860() -> None:
     def generator(
         with_columns: list[str] | None,
@@ -1240,7 +1239,10 @@ def test_predicate_pushdown_map_elements_io_plugin_22860() -> None:
     plan = q.explain()
     assert plan.index("SELECTION") > plan.index("PYTHON SCAN")
 
-    assert_frame_equal(q.collect(), pl.DataFrame({"row_nr": [2, 4, 5], "y": [1, 1, 1]}))
+    assert_frame_equal(
+        q.collect(engine="in-memory"),
+        pl.DataFrame({"row_nr": [2, 4, 5], "y": [1, 1, 1]}),
+    )
 
 
 def test_duplicate_filter_removal_23243() -> None:

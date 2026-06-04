@@ -54,7 +54,9 @@ fn test_full_outer_join_with_column_2988() -> PolarsResult<()> {
             ldf2,
             [col("key1"), col("key2")],
             [col("key1"), col("key2")],
-            JoinArgs::new(JoinType::Full).with_coalesce(JoinCoalesce::CoalesceColumns),
+            JoinArgs::new(JoinType::Full)
+                .with_maintain_order(MaintainOrderJoin::RightLeft)
+                .with_coalesce(JoinCoalesce::CoalesceColumns),
         )
         .with_columns([col("key1")])
         .collect()?;
