@@ -2,6 +2,7 @@ use polars_core::prelude::*;
 use polars_lazy::prelude::*;
 use polars_plan::dsl::Expr;
 use polars_sql::*;
+use polars_testing::asserts::assert_dataframe_equal;
 
 fn create_df() -> LazyFrame {
     df! {
@@ -148,12 +149,12 @@ fn test_corr() {
     let sql = r#"
     SELECT
         CORR(a, b) as corr,
-        COVAR(a, b) as covar,
-        COVAR_POP(a, b) as covar_pop
+        COVAR(a, b) as cov,
+        COVAR_POP(a, b) as cov_pop
     FROM df"#;
     let actual = ctx.execute(sql).unwrap().collect().unwrap();
 
-    assert_eq!(expected, actual, "expected {expected:?}, got {actual:?}");
+    assert_dataframe_equal(&actual, &expected, Default::default()).unwrap();
 }
 
 #[test]
