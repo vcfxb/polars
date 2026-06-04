@@ -184,7 +184,7 @@ fn iss_9560_join_as() {
     ctx.register("df1", df1.lazy());
     ctx.register("df2", df2.lazy());
     let sql = r#"
-        SELECT * FROM df1 AS t1 JOIN df2 AS t2 ON t1.id = t2.id ORDER BY ID
+        SELECT * FROM df1 AS t1 JOIN df2 AS t2 ON t1.id = t2.id ORDER BY ALL
     "#;
     let actual = ctx.execute(sql).unwrap().collect().unwrap();
 
