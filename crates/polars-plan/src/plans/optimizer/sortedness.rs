@@ -27,7 +27,7 @@ impl IRPlanSorted {
         let mut seen = PlHashSet::default();
         let mut sortedness = PlHashMap::default();
         let mut cache_proxy = PlHashMap::default();
-        let mut amort_passed_columns = ScratchHashSet::default();
+        let mut names_set_scratch = ScratchHashSet::default();
         is_sorted_rec(
             root,
             ir_arena,
@@ -35,7 +35,7 @@ impl IRPlanSorted {
             &mut seen,
             &mut sortedness,
             &mut cache_proxy,
-            &mut amort_passed_columns,
+            &mut names_set_scratch,
             true,
         );
         Self(sortedness)
