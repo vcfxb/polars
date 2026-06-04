@@ -540,7 +540,7 @@ fn is_sorted_rec(
                 // 1) [index, A, B]
                 // 2) [A, B, index]
                 // We choose (2), as that does better for the following case:
-                // `.set_sorted([A, B]).with_row_index().join_asof(on=[A, B])`
+                // `.sort([A, B]).with_row_index().join_asof(on=[A, B])`
                 rec!(*input)
                     .as_ref()
                     .map_or(Default::default(), |x| x.0.iter().cloned())
