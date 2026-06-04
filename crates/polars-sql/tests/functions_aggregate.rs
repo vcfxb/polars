@@ -178,11 +178,11 @@ fn test_corr_group_by() {
     SELECT
         c,
         CORR(a, b) AS corr,
-        COVAR(a, b) AS covar
+        COVAR(a, b) AS cov
     FROM df
     GROUP BY c
     ORDER BY c"#;
     let actual = ctx.execute(sql).unwrap().collect().unwrap();
 
-    assert_eq!(expected, actual, "expected {expected:?}, got {actual:?}");
+    assert_dataframe_equal(&actual, &expected, Default::default()).unwrap();
 }
