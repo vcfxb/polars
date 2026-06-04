@@ -541,6 +541,8 @@ fn is_sorted_rec(
                 // 2) [A, B, index]
                 // We choose (2), as that does better for the following case:
                 // `.sort([A, B]).with_row_index().join_asof(on=[A, B])`
+                // as the join_asof can successfully validate the input has a sorted (prefix) of
+                // [A, B],
                 rec!(*input)
                     .as_ref()
                     .map_or(Default::default(), |x| x.0.iter().cloned())
