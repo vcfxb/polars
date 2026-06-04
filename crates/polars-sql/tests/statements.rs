@@ -298,6 +298,7 @@ fn test_compound_join_three_tables() {
             ON df1.a = df2.a AND df1.b = df2.b
           INNER JOIN df3
             ON df3.a = df1.a AND df3.b = df1.b
+          ORDER BY ALL
     "#;
     let actual = ctx.execute(sql).unwrap().collect().unwrap();
     let expected = df! {
