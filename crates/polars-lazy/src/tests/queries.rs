@@ -299,7 +299,7 @@ fn test_lazy_query_4() -> PolarsResult<()> {
             base_df,
             [col("uid"), col("day")],
             [col("uid"), col("day")],
-            JoinArgs::new(JoinType::Inner).with_maintain_order(MaintainOrderJoin::LeftRight),
+            JoinArgs::new(JoinType::Inner).with_maintain_order(MaintainOrderJoin::RightLeft),
         )
         .collect()
         .unwrap();
